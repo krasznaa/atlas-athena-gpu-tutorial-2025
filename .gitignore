@@ -1,3 +1,6 @@
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
+# Files made by CMake in an in-source build.
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
@@ -10,3 +13,9 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+
+# Build directory used by VSCode.
+build
+
+# AtlasSetup artifact(s).
+.asetup.save
