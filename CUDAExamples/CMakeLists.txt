@@ -10,3 +10,9 @@ if(NOT CMAKE_CUDA_COMPILER)
    message(STATUS "CUDA not available. Not building package.")
    return()
 endif()
+enable_language(CUDA)
+
+# Component(s) in the package.
+atlas_add_component(CUDAExamples
+   src/*/*.h src/*/*.cxx src/*/*.cu
+   LINK_LIBRARIES AthenaBaseComps )

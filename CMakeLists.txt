@@ -5,7 +5,7 @@
 
 # Set up the project.
 cmake_minimum_required(VERSION 3.25)
-project(atlas-athena-gpu-tutorial-2025 VERSION 1.0.0 LANGUAGES CXX)
+project(ATLASAthenaGPUTutorial2025 VERSION 1.0.0 LANGUAGES CXX)
 
 # Find the base release.
 find_package(Athena 25.0 REQUIRED)
