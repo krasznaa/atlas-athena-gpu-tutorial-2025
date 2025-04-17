@@ -13,13 +13,18 @@ find_package(Athena 25.0 REQUIRED)
 # Set up CTest.
 atlas_ctest_setup()
 
+# Re-check all of the wildcarded expressions on every re-build in this
+# project.
+set(ATLAS_ALWAYS_CHECK_WILDCARDS TRUE CACHE BOOL
+    "(Re-)Check wildcards in file specifications on every build")
+
 # Set up the ATLAS CMake project.
 atlas_project(USE "Athena" "${Athena_VERSION}")
 
 # Set up the runtime environment setup script(s):
-lcg_generate_env( SH_FILE "${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh" )
-install( FILES "${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh"
-   DESTINATION "." )
+lcg_generate_env(SH_FILE "${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh")
+install(FILES "${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh"
+        DESTINATION ".")
 
 # Set up CPack.
 atlas_cpack_setup()
