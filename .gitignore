@@ -19,3 +19,6 @@ build
 
 # AtlasSetup artifact(s).
 .asetup.save
+
+# Athena artifact(s).
+eventLoopHeartBeat.txt

@@ -1,0 +1,24 @@
+{
+   "configurations": [
+      {
+         "name": "01 - LinearTransformCUDAAlg - CUDA",
+         "type": "cuda-gdb",
+         "request": "launch",
+         "program": "python",
+         "args": [
+            "${workspaceFolder}/CUDAExamples/python/01_LinearTransformConfig.py"
+         ],
+         "cwd": "${workspaceFolder}/build",
+         "environment": [
+            {
+               "name": "LD_LIBRARY_PATH",
+               "value": "${workspaceFolder}/build/x86_64-el9-gcc13-opt/lib:${workspaceFolder}/build/x86_64-el9-gcc13-dbg/lib:${env:LD_LIBRARY_PATH}"
+            },
+            {
+               "name": "DATAPATH",
+               "value": "${workspaceFolder}/build/x86_64-el9-gcc13-opt/share:${workspaceFolder}/build/x86_64-el9-gcc13-dbg/share:${env:DATAPATH}"
+            }
+         ],
+      }
+   ]
+}

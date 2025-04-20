@@ -16,3 +16,6 @@ enable_language(CUDA)
 atlas_add_component(CUDAExamples
    src/*/*.h src/*/*.cxx src/*/*.cu
    LINK_LIBRARIES AthenaBaseComps )
+
+# Install files from the package.
+atlas_install_python_modules(python/*.py)
