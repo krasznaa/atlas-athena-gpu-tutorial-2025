@@ -29,10 +29,6 @@ namespace GPUTutorial
       {
          // Stop right away if we're out of bounds.
          const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
-         if (i >= n)
-         {
-            return;
-         }
 
          // Perform a very simple linear transformation.
          output[i] = 2.0f * input[i] + 1.0f;
@@ -71,7 +67,7 @@ namespace GPUTutorial
 
       // Run the kernel.
       const std::size_t blockSize = 256;
-      const std::size_t numBlocks = (n + blockSize - 1) / blockSize;
+      const std::size_t numBlocks = (10000000 + blockSize - 1) / blockSize;
       Kernels::linearTransform<<<numBlocks, blockSize>>>(n, inputDevice,
                                                          outputDevice);
       ATH_CUDA_CHECK(cudaGetLastError());
