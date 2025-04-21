@@ -29,6 +29,9 @@ namespace GPUTutorial
       {
          // Stop right away if we're out of bounds.
          const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+         if (i >= n) {
+            return;
+         }
 
          // Perform a very simple linear transformation.
          output[i] = 2.0f * input[i] + 1.0f;
