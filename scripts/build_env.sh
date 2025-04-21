@@ -3,6 +3,10 @@
 # Script setting up the build environment for the tutorial.
 #
 
+# Clean out the environment as a first step.
+unset CMAKE_PREFIX_PATH
+unset ROOTSYS
+
 # Set up ALRB.
 export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
 source $ATLAS_LOCAL_ROOT_BASE/user/atlasLocalSetup.sh
@@ -14,18 +18,17 @@ asetup Athena,25.0.29
 if [ ! -f "${CUDACXX}" ]; then
 
    # Directory to set up CUDA from.
-   CUDA_DIR="/your/path/to/cuda"
+   CUDA_HOME=${CUDA_HOME:-"/your/path/to/cuda"}
 
    # (Try to) Set up CUDA.
-   if [ ! -d "${CUDA_DIR}" ]; then
+   if [ ! -d "${CUDA_HOME}" ]; then
       echo "ERROR:"
       echo "ERROR: CUDA not available. Please configure the setup script!"
       echo "ERROR:"
-      exit 1
    else
-      export CMAKE_PREFIX_PATH="${CUDA_DIR}"${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PATH}}
-      export PATH="${CUDA_DIR}/bin"${PATH:+:${PATH}}
-      export LD_LIBRARY_PATH="${CUDA_DIR}/lib64"{LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+      export CMAKE_PREFIX_PATH="${CUDA_HOME}"${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PATH}}
+      export PATH="${CUDA_HOME}/bin"${PATH:+:${PATH}}
+      export LD_LIBRARY_PATH="${CUDA_HOME}/lib64"{LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
       export CUDACXX=`which nvcc`
    fi
 fi

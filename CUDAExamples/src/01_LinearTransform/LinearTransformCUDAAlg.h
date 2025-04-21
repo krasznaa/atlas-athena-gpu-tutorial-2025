@@ -18,9 +18,9 @@ namespace GPUTutorial
       /// @{
 
       /// Function initializing the algorithm
-      virtual StatusCode initialize() override;
+      StatusCode initialize() override;
       /// Function executing the algorithm
-      virtual StatusCode execute(const EventContext &ctx) const override;
+      StatusCode execute(const EventContext &ctx) const override;
 
       /// @}
 
