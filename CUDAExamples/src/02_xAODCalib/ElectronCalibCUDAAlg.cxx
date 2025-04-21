@@ -68,6 +68,21 @@ namespace GPUTutorial
       ElectronDeviceContainer::buffer
           hostBuffer{nElectrons, m_memoryResources->m_syncHostMR};
 
+      // Protect against 0 electron events
+      if (nElectrons == 0) {
+         auto outputAux = std::make_unique<xAOD::AuxContainerBase>();
+         auto outputInterface = std::make_unique<xAOD::ElectronContainer>();
+         outputInterface->setStore(outputAux.get());
+
+         // Record the output container(s).
+         SG::WriteHandle output(m_outputKey, ctx);
+         ATH_CHECK(output.record(std::move(outputInterface),
+                                 std::move(outputAux)));
+
+         // Return gracefully.
+         return StatusCode::SUCCESS;
+      }
+
       // Copy data from the xAOD container into the host buffer.
       static const SG::AuxElement::ConstAccessor<float> etaAcc("eta");
       static const SG::AuxElement::ConstAccessor<float> phiAcc("phi");
