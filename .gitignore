@@ -22,3 +22,5 @@ build
 
 # Athena artifact(s).
 eventLoopHeartBeat.txt
+hostnamelookup.tmp
+PoolFileCatalog.xml

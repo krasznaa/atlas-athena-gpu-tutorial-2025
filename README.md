@@ -29,3 +29,5 @@ The exercises are documented in individual Python notebooks. Please open these
 to follow the individual exercises.
   - [Exercise 1](01_CUDA_LinearTransform.ipynb): Set up a simple CUDA algorithm,
     debug why it's not working, and fix its memory leaks.
+  - [Exercise 2](02_CUDA_xAODCalib.ipynb): Work with a "more realistic" Athena
+    algorithm that takes data from, and returns data to an xAOD container.
