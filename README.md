@@ -3,25 +3,28 @@
 This repository collects the code examples used in the 2025 edition of the
 GPU programming tutorial of the [ATLAS Experiment](https://atlas.cern/).
 
-## Environment Setup
+## Environment
 
-To set up the recommended build environment for the code in a terminal, please
-run:
+The exercises are primarily meant to be run on the
+[NERSC Perlmutter Supercomputer](https://docs.nersc.gov/systems/perlmutter/architecture/),
+using its [Jupyter notebook interface](https://jupyter.nersc.gov/).
 
-```sh
-source scripts/build_env.sh
-```
+Another option is to make use of
+[CERN's SWAN infrastructure](https://swan.cern.ch/). As long as you have a
+CERN account, you could open the repository on SWAN using
+[this link](https://cern.ch/swanserver/cgi-bin/go/?projurl=https://github.com/krasznaa/atlas-athena-gpu-tutorial-2025.git).
 
-It just makes sure that `setupATLAS` and `asetup` would be available even in
-environments in which they are not defined out of the box, and then set up
-a specific version of [Athena](https://gitlab.cern.ch/atlas/athena) for the
-tutorial.
-
-If you get an error from the script telling you that
-[CUDA](https://developer.nvidia.com/cuda-zone) could not be found, please update
-the script to set `CUDA_DIR` to a directory holding a local CUDA installation.
-This is needed everywehre outside of the CERN firewall, and even inside of the
-fireawall on (most) private laptops.
+It is also an excellent option to use the code on a private machine, using
+[VSCode](https://code.visualstudio.com/). Without much explanation, you need:
+  - A [RHEL 9](https://docs.redhat.com/fr/documentation/red_hat_enterprise_linux/9)
+    compatible OS ([WSL](https://learn.microsoft.com/en-us/windows/wsl/install)
+    can work very nicely with
+    [AlmaLinux9](https://apps.microsoft.com/store/detail/almalinux-9/9P5RWLM70SN9));
+  - [Athena-25.0.29](https://gitlab.cern.ch/atlas/athena/-/tags/release%2F25.0.29)
+    set up (using
+    [AtlasSetup](https://twiki.cern.ch/twiki/bin/view/AtlasComputing/AtlasSetupReference));
+  - CUDA 12.4+ set up for the runtime environment such that CMake would also
+    correctly find it.
 
 ## Exercises
 
