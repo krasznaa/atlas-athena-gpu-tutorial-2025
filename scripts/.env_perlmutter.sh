@@ -1,6 +1,4 @@
-#
 # Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
-#
 
 # Make CUDA available.
 export CMAKE_PREFIX_PATH="/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4"${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PATH}}
