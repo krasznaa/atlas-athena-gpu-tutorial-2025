@@ -16,6 +16,9 @@ endif()
 enable_language(SYCL)
 
 # Component(s) in the package.
-atlas_add_component(CUDAExamples
+atlas_add_component(SYCLExamples
    src/*/*.h src/*/*.cxx src/*/*.sycl
    LINK_LIBRARIES vecmem::core AthenaBaseComps)
+
+# Install files from the package.
+atlas_install_python_modules(python/*.py)
