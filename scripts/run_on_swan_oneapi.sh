@@ -9,7 +9,7 @@ SCRIPTDIR=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 # Set up the build environment. Done in such a way to avoid passing the command
 # line arguments to ALRB.
 env_setup() {
-   source ${SCRIPTDIR}/.env_swan.sh
+   source ${SCRIPTDIR}/.env_swan_oneapi.sh
 }
 env_setup
 

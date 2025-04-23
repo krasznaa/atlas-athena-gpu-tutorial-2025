@@ -11,11 +11,8 @@ source $ATLAS_LOCAL_ROOT_BASE/user/atlasLocalSetup.sh
 # Set up Athena-25.0.29.
 asetup Athena,25.0.29
 
-# Set up the oneAPI.
-ONEAPI_ROOT=${ONEAPI_ROOT:-"/home/krasznaa/software/intel/oneapi-2025.1.0"}
-source "${ONEAPI_ROOT}/setvars.sh" --include-intel-llvm
-unset TBBROOT
-unset CPATH
+# Set up the oneAPI compilers.
+source /cvmfs/projects.cern.ch/intelsw/oneAPI/linux/x86_64/2024/compiler/2024.1/env/vars.sh --include-intel-llvm
 export CC=`which clang`
 export CXX=`which clang++`
 export SYCLCXX="${CXX}"
