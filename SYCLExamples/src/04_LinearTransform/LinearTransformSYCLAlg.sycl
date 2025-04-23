@@ -1,0 +1,78 @@
+// Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
+// Local include(s).
+#include "LinearTransformSYCLAlg.h"
+
+// SYCL include(s).
+#include <sycl/sycl.hpp>
+
+namespace GPUTutorial
+{
+   namespace Kernels
+   {
+      /// Simple kernel for a parallel linear transformation.
+      struct LinearTransform;
+
+   } // namespace Kernels
+
+   StatusCode LinearTransformSYCLAlg::initialize()
+   {
+      // Simply greet the user.
+      ATH_MSG_INFO("Initializing " << name() << "...");
+
+      // Return gracefully.
+      return StatusCode::SUCCESS;
+   }
+
+   StatusCode LinearTransformSYCLAlg::execute(const EventContext &ctx) const
+   {
+      // Set up a SYCL queue.
+      sycl::queue queue;
+      ATH_MSG_INFO("Using device: "
+                   << queue.get_device().get_info<sycl::info::device::name>());
+
+      // Set up an input array on the host.
+      constexpr std::size_t n = 1000000;
+      std::vector<float> inputHost(n);
+      for (std::size_t i = 0; i < n; ++i)
+      {
+         inputHost[i] = static_cast<float>(i);
+      }
+
+      // Allocate input and output buffers on the device.
+      float *inputDevice = sycl::malloc_device<float>(n, queue);
+      float *outputDevice = sycl::malloc_device<float>(n, queue);
+
+      // Copy the input data to the device.
+      queue.memcpy(inputDevice, inputHost.data(), n * sizeof(float))
+          .wait_and_throw();
+
+      // Run the kernel.
+      queue.submit([&](sycl::handler &h)
+                   { h.parallel_for<Kernels::LinearTransform>(
+                         sycl::range<1>(n),
+                         [inputDevice, outputDevice](sycl::id<1> i)
+                         {
+                // Perform a very simple linear transformation.
+                outputDevice[i] = 2.0f * inputDevice[i] + 1.0f; }); })
+          .wait_and_throw();
+
+      // Copy the output data back to the host.
+      std::vector<float> outputHost(n);
+      queue.memcpy(outputHost.data(), outputDevice, n * sizeof(float))
+          .wait_and_throw();
+
+      // Print some elements of the output.
+      ATH_MSG_INFO("outputHost[0]      = " << outputHost[0]);
+      ATH_MSG_INFO("outputHost[1000]   = " << outputHost[1000]);
+      ATH_MSG_INFO("outputHost[999999] = " << outputHost[999999]);
+
+      // Free the device memory.
+      sycl::free(inputDevice, queue);
+      sycl::free(outputDevice, queue);
+
+      // Return gracefully.
+      return StatusCode::SUCCESS;
+   }
+
+} // namespace GPUTutorial

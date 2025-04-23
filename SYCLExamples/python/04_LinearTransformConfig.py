@@ -13,11 +13,11 @@ from AthenaConfiguration.MainServicesConfig import MainServicesCfg
 import sys
 
 
-def LinearTransformCUDAAlgCfg(flags, **kwargs):
+def LinearTransformSYCLAlgCfg(flags, **kwargs):
     # Create an accumulator to hold the configuration.
     result = ComponentAccumulator()
     # Create the example algorithm.
-    alg = CompFactory.GPUTutorial.LinearTransformCUDAAlg(**kwargs)
+    alg = CompFactory.GPUTutorial.LinearTransformSYCLAlg(**kwargs)
     result.addEventAlgo(alg)
     # Return the result to the caller.
     return result
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     acc = MainServicesCfg(flags)
 
     # Set up the tutorial algorithm.
-    acc.merge(LinearTransformCUDAAlgCfg(flags))
+    acc.merge(LinearTransformSYCLAlgCfg(flags))
 
     # Run the configuration.
     sys.exit(acc.run().isFailure())
