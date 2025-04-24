@@ -17,4 +17,4 @@ export CC=`which clang`
 export CXX=`which clang++`
 export CXXFLAGS="--gcc-toolchain=/cvmfs/sft.cern.ch/lcg/releases/gcc/13.1.0-b3d18/x86_64-el9"
 export SYCLCXX="${CXX}"
-export SYCLFLAGS="-fsycl -fsycl-targets=nvidia_gpu_sm_75"
+export SYCLFLAGS="${CXXFLAGS} -fsycl -fsycl-targets=nvidia_gpu_sm_75"
