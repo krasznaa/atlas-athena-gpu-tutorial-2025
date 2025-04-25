@@ -20,7 +20,7 @@ atlas_add_component(CUDAExamples
    src/*/*.h src/*/*.cxx src/*/*.cu
    LINK_LIBRARIES vecmem::core vecmem::cuda
                   GaudiKernel AthenaBaseComps AthContainers StoreGateLib
-                  xAODEgamma)
+                  xAODEgamma xAODJet)
 
 # Install files from the package.
 atlas_install_python_modules(python/*.py)
