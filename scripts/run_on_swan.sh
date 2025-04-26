@@ -13,7 +13,5 @@ env_setup() {
 }
 env_setup
 
-echo "$@"
-
 # Run the command.
 exec "$@" || exit 1
