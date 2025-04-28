@@ -34,5 +34,8 @@ to follow the individual exercises.
     debug why it's not working, and fix its memory leaks.
   - [Exercise 2](02_CUDA_xAODCalib.ipynb): Work with a "more realistic" Athena
     algorithm that takes data from, and returns data to an xAOD container.
+  - [Exercise 3](03_CUDA_AsynchronousAlgorithms.ipynb): Learn about using
+    "asynchronous" algorithms with Gaudi/Athena for executing CUDA code
+    efficiently in multi-threaded jobs.
   - [Exercise 4](04_SYCL_LinearTransform.ipynb): Learn some basics about using
     SYCL to run simple kernels on a GPU.
