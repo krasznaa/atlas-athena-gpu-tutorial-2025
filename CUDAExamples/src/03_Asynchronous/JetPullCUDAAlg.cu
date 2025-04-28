@@ -33,8 +33,8 @@
 
 namespace GPUTutorial
 {
-   constexpr float pi = std::numbers::pi_v<float>;
-   constexpr int BLOCKSIZE = 128;
+   // constexpr float pi = std::numbers::pi_v<float>;
+   // constexpr int BLOCKSIZE = 128;
    struct PtEtaPhi {
       /// A utility struct to wrap device arrays for pt, eta, and phi
       float* pt = nullptr;
@@ -68,7 +68,7 @@ namespace GPUTutorial
 
       // Create our CUDA stream
       Gaudi::CUDA::Stream stream(this);
-      
+
       // Setup device copies of inputs
       const std::size_t nJets = jetPt.size();
       const std::size_t totalConstituents = constPt.size();
@@ -84,7 +84,7 @@ namespace GPUTutorial
       ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_const.eta, constArraySize, stream));
       ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_const.phi, constArraySize, stream));
 
-      // [1] *** Setup memory copies *** 
+      // [1] *** Setup memory copies ***
 
       // [2] *** Calculate offsets using DeviceScan ***
       // This one is special. We're going to convert nConstituents into offsets
@@ -94,7 +94,7 @@ namespace GPUTutorial
 
       // [3] *** Calculate pulls ***
       // We'll use one block per jet, and choose 128 threads per block
-      
+
       // Free input arrays
       ATH_CUDA_CHECK(devAlloc.DeviceFree(d_jet.pt));
       ATH_CUDA_CHECK(devAlloc.DeviceFree(d_jet.eta));
@@ -102,7 +102,7 @@ namespace GPUTutorial
       ATH_CUDA_CHECK(devAlloc.DeviceFree(d_const.pt));
       ATH_CUDA_CHECK(devAlloc.DeviceFree(d_const.eta));
       ATH_CUDA_CHECK(devAlloc.DeviceFree(d_const.phi));
-      // [2] *** Uncomment the following line during task 2 *** 
+      // [2] *** Uncomment the following line during task 2 ***
       // ATH_CUDA_CHECK(devAlloc.DeviceFree(d_offsets));
 
       // [3] *** Free output buffers ***
