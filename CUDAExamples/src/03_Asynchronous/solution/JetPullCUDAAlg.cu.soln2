@@ -85,10 +85,33 @@ namespace GPUTutorial
       ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_const.phi, constArraySize, stream));
 
       // [1] *** Setup memory copies *** 
+      cudaMemcpyAsync(d_jet.pt, jetPt.data(), jetArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_jet.eta, jetEta.data(), jetArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_jet.phi, jetPhi.data(), jetArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_const.pt, constPt.data(), constArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_const.eta, constEta.data(), constArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_const.phi, constPhi.data(), constArraySize, cudaMemcpyHostToDevice, stream);
 
       // [2] *** Calculate offsets using DeviceScan ***
       // This one is special. We're going to convert nConstituents into offsets
       // and we need an extra slot for the "end" offset
+      std::size_t* d_offsets = nullptr;
+      ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_offsets, (nJets + 1) * sizeof(std::size_t), stream));
+      cudaMemcpyAsync(d_offsets, nConstituents.data(), nJets * sizeof(std::size_t), cudaMemcpyHostToDevice, stream);
+      cudaMemsetAsync(d_offsets + nJets, 0, sizeof(std::size_t), stream); // initialize last slot to 0
+      // Determine temporary storage required
+      // NB: No work is done so we don't need to wait for result
+      void* d_tempStorage = nullptr;
+      std::size_t tempStorageSize = 0;
+      ATH_CUDA_CHECK(cub::DeviceScan::ExclusiveSum(d_tempStorage, tempStorageSize, d_offsets, d_offsets, nJets + 1, stream));
+      // Allocate temporary storage
+      ATH_CUDA_CHECK(devAlloc.DeviceAllocate(&d_tempStorage, tempStorageSize, stream));
+      // Now run the calculation
+      ATH_CUDA_CHECK(cub::DeviceScan::ExclusiveSum(d_tempStorage, tempStorageSize, d_offsets, d_offsets, nJets + 1, stream));
+      // Synchronize (by awaiting the stream), then free the temp storage
+      ATH_CHECK(stream.await());
+      ATH_CUDA_CHECK(devAlloc.DeviceFree(d_tempStorage));
+      d_tempStorage = nullptr;
 
       // [3] *** Setup device buffers for outputs ***
 
@@ -102,8 +125,7 @@ namespace GPUTutorial
       ATH_CUDA_CHECK(devAlloc.DeviceFree(d_const.pt));
       ATH_CUDA_CHECK(devAlloc.DeviceFree(d_const.eta));
       ATH_CUDA_CHECK(devAlloc.DeviceFree(d_const.phi));
-      // [2] *** Uncomment the following line during task 2 *** 
-      // ATH_CUDA_CHECK(devAlloc.DeviceFree(d_offsets));
+      ATH_CUDA_CHECK(devAlloc.DeviceFree(d_offsets));
 
       // [3] *** Free output buffers ***
 

@@ -85,6 +85,12 @@ namespace GPUTutorial
       ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_const.phi, constArraySize, stream));
 
       // [1] *** Setup memory copies *** 
+      cudaMemcpyAsync(d_jet.pt, jetPt.data(), jetArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_jet.eta, jetEta.data(), jetArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_jet.phi, jetPhi.data(), jetArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_const.pt, constPt.data(), constArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_const.eta, constEta.data(), constArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_const.phi, constPhi.data(), constArraySize, cudaMemcpyHostToDevice, stream);
 
       // [2] *** Calculate offsets using DeviceScan ***
       // This one is special. We're going to convert nConstituents into offsets
