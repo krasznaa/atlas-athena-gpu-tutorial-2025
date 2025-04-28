@@ -49,7 +49,10 @@ if __name__ == '__main__':
     # Set up the job's flags.
     flags = initConfigFlags()
     flags.Exec.MaxEvents = 1000
+    #########################################
     flags.Exec.FPE = -2
+    flags.Concurrency.NumOffloadThreads = 2
+    #########################################
     flags.Input.Files = defaultTestFiles.AOD_RUN3_DATA
     flags.IOVDb.GlobalTag = defaultConditionsTags.RUN3_DATA
     # Ensure MC-based modifiers are removed (!74396)

@@ -137,7 +137,7 @@ namespace GPUTutorial
       // This one is special. We're going to convert nConstituents into offsets
       // and we need an extra slot for the "end" offset
       std::size_t* d_offsets = nullptr;
-      ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_offsets, nJets * sizeof(std::size_t), stream));
+      ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_offsets, (nJets + 1) * sizeof(std::size_t), stream));
       cudaMemcpyAsync(d_offsets, nConstituents.data(), nJets * sizeof(std::size_t), cudaMemcpyHostToDevice, stream);
       cudaMemsetAsync(d_offsets + nJets, 0, sizeof(std::size_t), stream); // initialize last slot to 0
       // Determine temporary storage required
@@ -149,6 +149,10 @@ namespace GPUTutorial
       ATH_CUDA_CHECK(devAlloc.DeviceAllocate(&d_tempStorage, tempStorageSize, stream));
       // Now run the calculation
       ATH_CUDA_CHECK(cub::DeviceScan::ExclusiveSum(d_tempStorage, tempStorageSize, d_offsets, d_offsets, nJets + 1, stream));
+      // Synchronize (by awaiting the stream), then free the temp storage
+      ATH_CHECK(stream.await());
+      ATH_CUDA_CHECK(devAlloc.DeviceFree(d_tempStorage));
+      d_tempStorage = nullptr;
 
       // *** Setup device buffers for outputs ***
       float* d_jetPullEta = nullptr;
@@ -158,7 +162,15 @@ namespace GPUTutorial
 
       // *** Calculate pulls ***
       // We'll use one block per jet, and choose 128 threads per block
-      
+      Kernels::calculatePulls<<<nJets, BLOCKSIZE, 0, stream>>>(d_jet, d_const, d_offsets, nJets, d_jetPullEta, d_jetPullPhi);
+      ATH_CUDA_CHECK(cudaGetLastError()); // Check for errors during kernel launch
+      // Copy back the results
+      jetPullEta.resize(nJets);
+      jetPullPhi.resize(nJets);
+      ATH_CUDA_CHECK(cudaMemcpyAsync(jetPullEta.data(), d_jetPullEta, jetArraySize, cudaMemcpyDeviceToHost, stream));
+      ATH_CUDA_CHECK(cudaMemcpyAsync(jetPullPhi.data(), d_jetPullPhi, jetArraySize, cudaMemcpyDeviceToHost, stream));
+      // Synchronize
+      ATH_CHECK(stream.await());
       
       // Free input arrays
       ATH_CUDA_CHECK(devAlloc.DeviceFree(d_jet.pt));

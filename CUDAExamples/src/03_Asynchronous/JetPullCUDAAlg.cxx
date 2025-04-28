@@ -114,9 +114,6 @@ namespace GPUTutorial
          }
       }
    
-      ATH_MSG_INFO(std::format("Read {0} jets with eta[0,{0} -1] [{1},{2}] and {3} nConstituents[0,{0} -1] [{4},{5}]",
-                  nJets, jetEta[0], jetEta[nJets - 1], totalConstituents, nConstituents[0], nConstituents[nJets - 1]));
-
       // Create host buffers to store results
       std::pmr::vector<float> jetPullEta(nJets, m_memoryResources->hostMR());
       std::pmr::vector<float> jetPullPhi(nJets, m_memoryResources->hostMR());
@@ -129,6 +126,19 @@ namespace GPUTutorial
       // Get an std::pair of unique_ptrs back
       auto outputJetsSC = xAOD::shallowCopyContainer(*inputJets, ctx);
       auto&& [outputJets, outputAux] = outputJetsSC;
+      {
+         SG::Accessor<float> pullEtaAcc("pullEta");
+         SG::Accessor<float> pullPhiAcc("pullPhi");
+         std::size_t i = 0;
+         for(auto jet : *outputJets) {
+            pullEtaAcc(*jet) = jetPullEta[i];
+            pullPhiAcc(*jet) = jetPullPhi[i];
+            ++i;
+         }
+      }
+      if (nJets > 0) {
+         ATH_MSG_INFO(std::format("Jet 0 with {} components has pull vector [{}, {}]", nConstituents[0], jetPullEta[0], jetPullPhi[0]));
+      }
 
       // Record
       SG::WriteHandle output(m_outputKey, ctx);
