@@ -33,7 +33,7 @@ namespace GPUTutorial
                                const std::pmr::vector<float>& constPt, ///< [in] flat array of constituent pTs (grouped by jet)
                                const std::pmr::vector<float>& constEta, ///< [in] flat array of constituent etas (grouped by jet)
                                const std::pmr::vector<float>& constPhi, ///< [in] flat array of constituent phis (grouped by jet)
-                               std::pmr::vector<float>& jetPullY, ///< [out] rapidity component of each jet pull vector
+                               std::pmr::vector<float>& jetPullEta, ///< [out] eta component of each jet pull vector
                                std::pmr::vector<float>& jetPullPhi ///< [out] phi component of each jet pull vector
                               ) const;
 

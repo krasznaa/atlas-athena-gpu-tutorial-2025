@@ -118,12 +118,12 @@ namespace GPUTutorial
                   nJets, jetEta[0], jetEta[nJets - 1], totalConstituents, nConstituents[0], nConstituents[nJets - 1]));
 
       // Create host buffers to store results
-      std::pmr::vector<float> jetPullY(nJets, m_memoryResources->hostMR());
+      std::pmr::vector<float> jetPullEta(nJets, m_memoryResources->hostMR());
       std::pmr::vector<float> jetPullPhi(nJets, m_memoryResources->hostMR());
 
       // Run GPU code
-      ATH_CHECK(device_execute(jetPt, jetEta, jetPhi, nConstituents, constPt, constEta, constPhi,
-                               jetPullY, jetPullPhi));
+      ATH_CHECK(deviceExecute(jetPt, jetEta, jetPhi, nConstituents, constPt, constEta, constPhi,
+                               jetPullEta, jetPullPhi));
       
       // Save output
       // Get an std::pair of unique_ptrs back

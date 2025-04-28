@@ -13,13 +13,14 @@ endif()
 enable_language(CUDA)
 
 # Find the required packages.
+find_package(CUDAToolkit)
 find_package(vecmem COMPONENTS CUDA)
 
 # Component(s) in the package.
 atlas_add_component(CUDAExamples
    src/*/*.h src/*/*.cxx src/*/*.cu
    LINK_LIBRARIES vecmem::core vecmem::cuda
-                  GaudiKernel AthenaBaseComps AthContainers StoreGateLib
+                  GaudiKernel Gaudi::GaudiCUDALib AthenaBaseComps AthContainers StoreGateLib
                   xAODEgamma xAODJet)
 
 # Install files from the package.
