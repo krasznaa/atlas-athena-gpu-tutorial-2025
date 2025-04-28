@@ -1,0 +1,121 @@
+// Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
+// Local include(s).
+#include "JetPullCUDAAlg.h"
+
+// Framework include(s).
+#include "AthenaKernel/errorcheck.h"
+
+// Gaudi include(s)
+#include "Gaudi/CUDA/CUDAStream.h"
+
+// CUDA include(s)
+#include "cub/cub.cuh"
+
+// Standard Library includes(s)
+#include <numbers>
+
+/// Helper macro for checking CUDA calls
+#define ATH_CUDA_CHECK(EXP)                                             \
+   do                                                                   \
+   {                                                                    \
+      const cudaError_t ce = EXP;                                       \
+      if (ce != cudaSuccess)                                            \
+      {                                                                 \
+         REPORT_ERROR_WITH_CONTEXT(StatusCode::FAILURE,                 \
+                                   "GPUTutorial::JetPullCUDAAlg")       \
+             << "Failed to execute \""                                  \
+             << #EXP << "\" :"                                          \
+             << cudaGetErrorName(ce) << ": " << cudaGetErrorString(ce); \
+         return StatusCode::FAILURE;                                    \
+      }                                                                 \
+   } while (false)
+
+namespace GPUTutorial
+{
+   constexpr float pi = std::numbers::pi_v<float>;
+   constexpr int BLOCKSIZE = 128;
+   struct PtEtaPhi {
+      /// A utility struct to wrap device arrays for pt, eta, and phi
+      float* pt = nullptr;
+      float* eta = nullptr;
+      float* phi = nullptr;
+   };
+
+   namespace Kernels
+   {
+      __global__ void calculatePulls(PtEtaPhi d_jet, PtEtaPhi d_const,
+                                     const std::size_t* d_offsets, std::size_t nJets,
+                                     float* d_pullEta, float* d_pullPhi)
+      {
+         // [3] *** Fill in kernel here ***
+      }
+   } // namespace Kernels
+
+   StatusCode JetPullCUDAAlg::deviceExecute(const std::span<const float>& jetPt, ///< [in] Jet pT array
+                                            const std::span<const float>& jetEta, ///< [in] Jet eta array
+                                            const std::span<const float>& jetPhi, ///< [in] jet phi array
+                                            const std::pmr::vector<std::size_t>& nConstituents, ///< [in] number of constituents for each jet
+                                            const std::pmr::vector<float>& constPt, ///< [in] flat array of constituent pTs (grouped by jet)
+                                            const std::pmr::vector<float>& constEta, ///< [in] flat array of constituent etas (grouped by jet)
+                                            const std::pmr::vector<float>& constPhi, ///< [in] flat array of constituent phis (grouped by jet)
+                                            std::pmr::vector<float>& jetPullEta, ///< [out] eta component of each jet pull vector
+                                            std::pmr::vector<float>& jetPullPhi ///< [out] phi component of each jet pull vector
+                                          ) const
+   {
+      // Setup the device allocator
+      static cub::CachingDeviceAllocator devAlloc{};
+
+      // Create our CUDA stream
+      Gaudi::CUDA::Stream stream(this);
+      
+      // Setup device copies of inputs
+      const std::size_t nJets = jetPt.size();
+      const std::size_t totalConstituents = constPt.size();
+      const std::size_t jetArraySize = nJets * sizeof(float);
+      const std::size_t constArraySize = totalConstituents * sizeof(float);
+
+      PtEtaPhi d_jet{};
+      PtEtaPhi d_const{};
+      ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_jet.pt, jetArraySize, stream));
+      ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_jet.eta, jetArraySize, stream));
+      ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_jet.phi, jetArraySize, stream));
+      ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_const.pt, constArraySize, stream));
+      ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_const.eta, constArraySize, stream));
+      ATH_CUDA_CHECK(devAlloc.DeviceAllocate((void**)&d_const.phi, constArraySize, stream));
+
+      // [1] *** Setup memory copies *** 
+      cudaMemcpyAsync(d_jet.pt, jetPt.data(), jetArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_jet.eta, jetEta.data(), jetArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_jet.phi, jetPhi.data(), jetArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_const.pt, constPt.data(), constArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_const.eta, constEta.data(), constArraySize, cudaMemcpyHostToDevice, stream);
+      cudaMemcpyAsync(d_const.phi, constPhi.data(), constArraySize, cudaMemcpyHostToDevice, stream);
+
+      // [2] *** Calculate offsets using DeviceScan ***
+      // This one is special. We're going to convert nConstituents into offsets
+      // and we need an extra slot for the "end" offset
+
+      // [3] *** Setup device buffers for outputs ***
+
+      // [3] *** Calculate pulls ***
+      // We'll use one block per jet, and choose 128 threads per block
+      
+      // Free input arrays
+      ATH_CUDA_CHECK(devAlloc.DeviceFree(d_jet.pt));
+      ATH_CUDA_CHECK(devAlloc.DeviceFree(d_jet.eta));
+      ATH_CUDA_CHECK(devAlloc.DeviceFree(d_jet.phi));
+      ATH_CUDA_CHECK(devAlloc.DeviceFree(d_const.pt));
+      ATH_CUDA_CHECK(devAlloc.DeviceFree(d_const.eta));
+      ATH_CUDA_CHECK(devAlloc.DeviceFree(d_const.phi));
+      // [2] *** Uncomment the following line during task 2 *** 
+      // ATH_CUDA_CHECK(devAlloc.DeviceFree(d_offsets));
+
+      // [3] *** Free output buffers ***
+
+      // Finally, await completion of anything left scheduled on the stream
+      ATH_CHECK(stream.await());
+      return StatusCode::SUCCESS;
+   }
+
+} // namespace GPUTutorial
